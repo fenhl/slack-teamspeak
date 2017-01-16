@@ -37,5 +37,5 @@ if __name__ == '__main__':
     while True:
         new_users, last_users = update_users(last_users)
         if len(new_users) > 0:
-            slack.chat.post_message(CONFIG.get('channel', '#teamspeak'), CONFIG.get('message', '{} joined').format(join(new_users)))
+            slack.chat.post_message(CONFIG.get('channel', '#teamspeak'), CONFIG.get('message', '{} joined').format(join(new_users)), as_user=True)
         time.sleep(CONFIG.get('checkInterval', 5))
