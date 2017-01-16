@@ -3,6 +3,7 @@
 import sys
 
 import basedir
+import slacker
 import time
 import ts3
 
@@ -31,9 +32,10 @@ def update_users(last_users):
     return sorted(client['client_nickname'] for client in clientlist.values() if client['client_database_id'] in new_users), current_users
 
 if __name__ == '__main__':
+    slack = slacker.Slacker(CONFIG['apiToken'])
     last_users = set()
     while True:
         new_users, last_users = update_users(last_users)
         if len(new_users) > 0:
-            print(CONFIG.get('message', '{} joined').format(join(new_users))) #TODO post to Slack
+            slack.chat(CONFIG.get('channel', '#teamspeak'), CONFIG.get('message', '{} joined').format(join(new_users)))
         time.sleep(CONFIG.get('checkInterval', 5))
