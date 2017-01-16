@@ -34,5 +34,6 @@ if __name__ == '__main__':
     last_users = set()
     while True:
         new_users, last_users = update_users(last_users)
-        print(CONFIG.get('message', '{} joined').format(join(new_users))) #TODO post to Slack
+        if len(new_users) > 0:
+            print(CONFIG.get('message', '{} joined').format(join(new_users))) #TODO post to Slack
         time.sleep(CONFIG.get('checkInterval', 5))
