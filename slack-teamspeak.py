@@ -29,13 +29,18 @@ def update_users(last_users):
     clientlist = srv.clientlist()
     current_users = {client['client_database_id'] for client in clientlist.values() if client['client_type'] == '0'}
     new_users = current_users - last_users
-    return sorted(client['client_nickname'] for client in clientlist.values() if client['client_database_id'] in new_users), current_users
+	former_users = sorted(client['client_nickname'] for client in last_users if client not in current_users)
+    return sorted(client['client_nickname'] for client in clientlist.values() if client['client_database_id'] in new_users), current_users, former_users
 
 if __name__ == '__main__':
     slack = slacker.Slacker(CONFIG['apiToken'])
     last_users = set()
     while True:
-        new_users, last_users = update_users(last_users)
-        if len(new_users) > 0:
-            slack.chat.post_message(CONFIG.get('channel', '#teamspeak'), CONFIG.get('message', '{} joined').format(join(new_users)), as_user=True)
+        new_users, last_users, former_users = update_users(last_users)
+        if len(new_users) > 0 and len(former_users) == 0:
+            slack.chat.post_message(CONFIG.get('channel', '#teamspeak'), CONFIG.get('message', '{} joined. There are now {} active users.').format(join(new_users), len(last_users)), as_user=True)
+        elif len(new_users) == 0 and len(former_users) > 0:
+            slack.chat.post_message(CONFIG.get('channel', '#teamspeak'), CONFIG.get('message', '{} left. There are now {} active users.').format(join(former_users), len(last_users)), as_user=True)
+        elif len(new_users) > 0 and len(former_users) > 0:
+            slack.chat.post_message(CONFIG.get('channel', '#teamspeak'), CONFIG.get('message', '{} left and {} joined. There are now {} active users.').format(join(former_users), join(last_users), len(last_users)), as_user=True)
         time.sleep(CONFIG.get('checkInterval', 5))
