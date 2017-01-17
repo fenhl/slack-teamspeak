@@ -34,7 +34,7 @@ def update_users(last_users):
 
 if __name__ == '__main__':
     slack = slacker.Slacker(CONFIG['apiToken'])
-    last_users = dict() # Now contains the id as key and the nickname as value
+    last_users = {} # Now contains the id as key and the nickname as value
     while True:
         new_users, last_users, former_users = update_users(last_users)
         if len(new_users) > 0 and len(former_users) == 0:
@@ -42,5 +42,5 @@ if __name__ == '__main__':
         elif len(new_users) == 0 and len(former_users) > 0:
             slack.chat.post_message(CONFIG.get('channel', '#teamspeak'), CONFIG.get('leaveMessage', '{} left. There are now {} active users.').format(join(former_users), len(last_users)), as_user=True)
         elif len(new_users) > 0 and len(former_users) > 0:
-            slack.chat.post_message(CONFIG.get('channel', '#teamspeak'), CONFIG.get('joinLeaveMessage', '{} left and {} joined. There are now {} active users.').format(join(former_users), join(last_users), len(last_users)), as_user=True)
+            slack.chat.post_message(CONFIG.get('channel', '#teamspeak'), CONFIG.get('joinLeaveMessage', '{} left and {} joined. There are now {} active users.').format(join(former_users), join(new_users), len(last_users)), as_user=True)
         time.sleep(CONFIG.get('checkInterval', 5))
