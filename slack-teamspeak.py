@@ -37,10 +37,14 @@ if __name__ == '__main__':
     last_users = {} # Now contains the id as key and the nickname as value
     while True:
         new_users, last_users, former_users = update_users(last_users)
+        countActiveUsers = CONFIG.get('activeUsersPlural', 'There are now {} active users.').format(len(last_users))
+        if len(last_users) == 1:
+            countActiveUsers = CONFIG.get('activeUsersSingular', 'There is now only one active user.')
+        countActiveUsers = ' ' + countActiveUsers
         if len(new_users) > 0 and len(former_users) == 0:
-            slack.chat.post_message(CONFIG.get('channel', '#teamspeak'), CONFIG.get('joinMessage', '{} joined. There are now {} active users.').format(join(new_users), len(last_users)), as_user=True)
+            slack.chat.post_message(CONFIG.get('channel', '#teamspeak'), CONFIG.get('joinMessage', '{} joined.').format(join(new_users)) + countActiveUsers, as_user=True)
         elif len(new_users) == 0 and len(former_users) > 0:
-            slack.chat.post_message(CONFIG.get('channel', '#teamspeak'), CONFIG.get('leaveMessage', '{} left. There are now {} active users.').format(join(former_users), len(last_users)), as_user=True)
+            slack.chat.post_message(CONFIG.get('channel', '#teamspeak'), CONFIG.get('leaveMessage', '{} left.').format(join(former_users)) + countActiveUsers, as_user=True)
         elif len(new_users) > 0 and len(former_users) > 0:
-            slack.chat.post_message(CONFIG.get('channel', '#teamspeak'), CONFIG.get('joinLeaveMessage', '{} left and {} joined. There are now {} active users.').format(join(former_users), join(new_users), len(last_users)), as_user=True)
+            slack.chat.post_message(CONFIG.get('channel', '#teamspeak'), CONFIG.get('joinLeaveMessage', '{} left and {} joined.').format(join(former_users), join(new_users)) + countActiveUsers, as_user=True)
         time.sleep(CONFIG.get('checkInterval', 5))
