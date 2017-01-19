@@ -2,6 +2,8 @@
 
 import sys
 
+sys.path.append('/opt/py')
+
 import basedir
 import slacker
 import time
